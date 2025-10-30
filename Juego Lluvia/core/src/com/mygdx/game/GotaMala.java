@@ -2,14 +2,17 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Texture;
 
-public class GotaMala extends Gota {
+public class GotaMala extends ObjetoCaida {
 
-    public GotaMala(float x, float y, float velocidad) {
-        super(x, y, velocidad, new Texture("gotaMala.png"));
+    // No necesita sonido propio, el tarro lo reproduce al ser dañado
+    public GotaMala(Texture textura, float x, float y) {
+        super(textura, x, y);
     }
 
     @Override
-    public void efecto(Tarro tarro) {
-        tarro.dañar(); // método que ya tienes en Tarro
+    protected void aplicarEfecto(Tarro tarro) {
+        tarro.dañar(); // El método dañar() del tarro ya reproduce el sonido
     }
+    
+    // No sobreescribe reproducirSonido(), usando el hook vacío.
 }

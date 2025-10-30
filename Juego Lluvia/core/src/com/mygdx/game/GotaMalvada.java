@@ -1,0 +1,25 @@
+package com.mygdx.game;
+
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
+
+public class GotaMalvada extends ObjetoCaida {
+
+    private Sound evilSound;
+
+    public GotaMalvada(Texture textura, Sound evilSound, float x, float y) {
+        super(textura, x, y);
+        this.evilSound = evilSound;
+    }
+
+    @Override
+    protected void aplicarEfecto(Tarro tarro) {
+        // Usamos el método sumarPuntos con un valor negativo
+        tarro.sumarPuntos(-100); 
+    }
+
+    @Override
+    protected void reproducirSonido() {
+        evilSound.play();
+    }
+}
