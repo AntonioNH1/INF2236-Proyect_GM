@@ -11,56 +11,65 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class PruebaGameLLuvia extends ApplicationAdapter {
-       private OrthographicCamera camera;
+	private OrthographicCamera camera;
 	   private SpriteBatch batch;	   
 	   private BitmapFont font;
 	   
 	   private Tarro tarro;
 	   private Lluvia lluvia;
-       
-       // MODIFICADO: Almacenamos todos los assets aquí
-       private Texture texTarro;
-       private Texture texGotaBuena;
-       private Texture texGotaMala;
-       private Texture texGotaDorada;
-       private Texture texGotaCurativa;
-       private Texture texGotaMalvada;
-       
-       private Sound soundHurt;
-       private Sound soundDrop;
-       private Sound soundGold;
-       private Sound soundHeal;
-       private Sound soundEvil;
-       
-       private Music musicRain;
-       
+    
+    // MODIFICADO: Almacenamos todos los assets aquí
+    private Texture texTarro;
+    private Texture texGotaBuena;
+    private Texture texGotaMala;
+    private Texture texGotaDorada;
+    private Texture texGotaCurativa;
+    private Texture texGotaMalvada;
+    private Texture texGotaVelocidad;
+    
+    private Sound soundHurt;
+    private Sound soundDrop;
+    private Sound soundGold;
+    private Sound soundHeal;
+    private Sound soundEvil;
+    private Sound soundSpeed;
+    
+    private Music musicRain;
+    
 	@Override
 	public void create () {
 		 font = new BitmapFont();
 		 
 		  // Cargar todas las texturas
 		  texTarro = new Texture(Gdx.files.internal("bucket.png"));
-          texGotaBuena = new Texture(Gdx.files.internal("drop.png"));
-          texGotaMala = new Texture(Gdx.files.internal("dropBad.png"));
-          // Asegúrate de tener estas imágenes en tu carpeta 'assets' (o 'internal')
-          texGotaDorada = new Texture(Gdx.files.internal("dropGold.png"));
-          texGotaCurativa = new Texture(Gdx.files.internal("dropHeal.png"));
-          texGotaMalvada = new Texture(Gdx.files.internal("dropEvil.png"));
-          
+       texGotaBuena = new Texture(Gdx.files.internal("drop.png"));
+       texGotaMala = new Texture(Gdx.files.internal("dropBad.png"));
+       // Asegúrate de tener estas imágenes en tu carpeta 'assets' (o 'internal')
+       texGotaDorada = new Texture(Gdx.files.internal("dropGold.png"));
+       texGotaCurativa = new Texture(Gdx.files.internal("dropHeal.png"));
+       texGotaMalvada = new Texture(Gdx.files.internal("dropEvil.png"));
+       
+       // 🔹 NUEVO: textura de la gota velocidad
+       texGotaVelocidad = new Texture(Gdx.files.internal("GotaVelocidad.png"));
+       // asegúrate de tener "dropSpeed.png" en la carpeta assets
+       
 	      // Cargar todos los sonidos
-          soundHurt = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
-          soundDrop = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-          // Asegúrate de tener estos sonidos
-          soundGold = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-          soundHeal = Gdx.audio.newSound(Gdx.files.internal("heal.wav"));
-          soundEvil = Gdx.audio.newSound(Gdx.files.internal("hurtScore.wav"));
-         
+       soundHurt = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
+       soundDrop = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+       // Asegúrate de tener estos sonidos
+       soundGold = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+       soundHeal = Gdx.audio.newSound(Gdx.files.internal("heal.wav"));
+       soundEvil = Gdx.audio.newSound(Gdx.files.internal("hurtScore.wav"));
+       
+    // 🔹 NUEVO: sonido exclusivo para la gota velocidad
+       soundSpeed = Gdx.audio.newSound(Gdx.files.internal("speed.mp3"));
+      
 	      musicRain = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-          
-          // Creación de objetos e inyección de dependencias
+       
+       // Creación de objetos e inyección de dependencias
 		  tarro = new Tarro(texTarro, soundHurt);
-          lluvia = new Lluvia(texGotaBuena, texGotaMala, texGotaDorada, texGotaCurativa, texGotaMalvada,
-                            soundDrop, soundGold, soundHeal, soundEvil, musicRain);
+       lluvia = new Lluvia(texGotaBuena, texGotaMala, texGotaDorada, texGotaCurativa, texGotaMalvada,
+                         soundDrop, soundGold, soundHeal, soundEvil, musicRain, texGotaVelocidad, soundSpeed);
 	      
 	      camera = new OrthographicCamera();
 	      camera.setToOrtho(false, 800, 480);
@@ -73,9 +82,9 @@ public class PruebaGameLLuvia extends ApplicationAdapter {
 	@Override
 	public void render () {
 		// --- NINGÚN CAMBIO ES NECESARIO AQUÍ ---
-        // La lógica de renderizado sigue siendo la misma gracias
-        // a la correcta abstracción.
-        
+     // La lógica de renderizado sigue siendo la misma gracias
+     // a la correcta abstracción.
+     
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
@@ -98,29 +107,29 @@ public class PruebaGameLLuvia extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
-          // MODIFICADO: Esta clase ahora libera todos los assets que cargó
+       // MODIFICADO: Esta clase ahora libera todos los assets que cargó
 	      tarro.destruir(); // (ahora vacío)
-          lluvia.destruir(); // (ahora vacío)
+       lluvia.destruir(); // (ahora vacío)
 	      
-          // Texturas
-          texTarro.dispose();
-          texGotaBuena.dispose();
-          texGotaMala.dispose();
-          texGotaDorada.dispose();
-          texGotaCurativa.dispose();
-          texGotaMalvada.dispose();
-          
-          // Sonidos
-          soundHurt.dispose();
-          soundDrop.dispose();
-          soundGold.dispose();
-          soundHeal.dispose();
-          soundEvil.dispose();
-          
-          // Música
-          musicRain.dispose();
-          
-          // Otros
+       // Texturas
+       texTarro.dispose();
+       texGotaBuena.dispose();
+       texGotaMala.dispose();
+       texGotaDorada.dispose();
+       texGotaCurativa.dispose();
+       texGotaMalvada.dispose();
+       
+       // Sonidos
+       soundHurt.dispose();
+       soundDrop.dispose();
+       soundGold.dispose();
+       soundHeal.dispose();
+       soundEvil.dispose();
+       
+       // Música
+       musicRain.dispose();
+       
+       // Otros
 	      batch.dispose();
 	      font.dispose();
 	}

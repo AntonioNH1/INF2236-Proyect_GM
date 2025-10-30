@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class Tarro {
 	   private Rectangle bucket;
@@ -19,6 +19,9 @@ public class Tarro {
 	   private boolean herido = false;
 	   private int tiempoHeridoMax=50;
 	   private int tiempoHerido;
+	   private float velocidadBase = 400;
+	   private float multiplicadorVelocidad = 1f;
+	   private long tiempoBoost = 0;
 	   
 	   public Tarro(Texture tex, Sound ss) {
 		   bucketImage = tex;
@@ -45,8 +48,10 @@ public class Tarro {
 		 * NUEVO MÉTODO para la GotaCurativa
 		 */
 		public void sumarVida() {
-			vidas++;
+		    vidas++;
+		    if (vidas > 3) vidas = 3; // límite máximo (puedes cambiarlo)
 		}
+
 	
 	   public void crear() {
  		  // ... (sin cambios)
@@ -57,13 +62,17 @@ public class Tarro {
 		  bucket.height = 64;
 	   }
 	   
-	   public void dañar() {
- 		  // ... (sin cambios)
-		  vidas--;
-		  herido = true;
-		  tiempoHerido=tiempoHeridoMax;
-		  sonidoHerido.play();
-	   }
+	   
+	   public void restarVidas(int cantidad) {
+		    if (vidas <= 0) return; // evita seguir restando si ya está en 0
+		    vidas -= cantidad;
+		    if (vidas < 0) vidas = 0; 
+		    herido = true;
+		    tiempoHerido = tiempoHeridoMax;
+		    sonidoHerido.play();
+		}
+
+
 	   
 	   public void dibujar(SpriteBatch batch) {
  		  // ... (sin cambios)
@@ -76,14 +85,31 @@ public class Tarro {
 		 }
 	   } 
 	   
+	   public void aumentarVelocidadTemporal(float factor, int segundos) {
+		    multiplicadorVelocidad = factor;
+		    tiempoBoost = TimeUtils.millis() + (segundos * 1000);
+		}
 	   
-	   public void actualizarMovimiento() { 
-		   // ... (sin cambios)
-		   if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= velx * Gdx.graphics.getDeltaTime();
-		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
-		   if(bucket.x < 0) bucket.x = 0;
-		   if(bucket.x > 800 - 64) bucket.x = 800 - 64;
+	   private void revisarBoost() {
+		    if (tiempoBoost > 0 && TimeUtils.millis() > tiempoBoost) {
+		        multiplicadorVelocidad = 1f;
+		        tiempoBoost = 0;
+		    }
+		}
+	   
+	   public void actualizarMovimiento() {
+	       revisarBoost();
+	       float velxActual = velocidadBase * multiplicadorVelocidad;
+
+	       if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+	           bucket.x -= velxActual * Gdx.graphics.getDeltaTime();
+	       if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+	           bucket.x += velxActual * Gdx.graphics.getDeltaTime();
+
+	       if (bucket.x < 0) bucket.x = 0;
+	       if (bucket.x > 800 - bucket.width) bucket.x = 800 - bucket.width;
 	   }
+	   
 	    
 	/**
 	 * MODIFICADO: La clase que carga un recurso (PruebaGameLLuvia)
@@ -97,5 +123,11 @@ public class Tarro {
    public boolean estaHerido() {
 	   return herido;
    }
-	   
+   
+   public void reiniciar() {
+	    this.vidas = 3;
+	    this.puntos = 0;
+	    this.bucket.x = 800 / 2 - 64 / 2;
+	    this.bucket.y = 20;
+	}
 }

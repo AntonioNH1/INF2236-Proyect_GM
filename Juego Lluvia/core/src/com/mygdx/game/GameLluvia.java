@@ -4,6 +4,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,9 +16,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 
 public class GameLluvia extends ApplicationAdapter {
-    private OrthographicCamera camera;
+	private OrthographicCamera camera;
 	   private SpriteBatch batch;	   
 	   private BitmapFont font;
+	   private ControlReinicio controlReinicio;
+
 	   
 	   private Tarro tarro;
 	   private Lluvia lluvia;
@@ -29,12 +32,14 @@ public class GameLluvia extends ApplicationAdapter {
     private Texture texGotaDorada;
     private Texture texGotaCurativa;
     private Texture texGotaMalvada;
+    private Texture texGotaVelocidad;
     
     private Sound soundHurt;
     private Sound soundDrop;
     private Sound soundGold;
     private Sound soundHeal;
     private Sound soundEvil;
+    private Sound soundSpeed;
     
     private Music musicRain;
     
@@ -51,20 +56,27 @@ public class GameLluvia extends ApplicationAdapter {
        texGotaCurativa = new Texture(Gdx.files.internal("dropHeal.png"));
        texGotaMalvada = new Texture(Gdx.files.internal("dropEvil.png"));
        
+       // 🔹 NUEVO: textura de la gota velocidad
+       texGotaVelocidad = new Texture(Gdx.files.internal("GotaVelocidad.png"));
+       // asegúrate de tener "dropSpeed.png" en la carpeta assets
+       
 	      // Cargar todos los sonidos
        soundHurt = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
        soundDrop = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
        // Asegúrate de tener estos sonidos
        soundGold = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-       soundHeal = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-       soundEvil = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+       soundHeal = Gdx.audio.newSound(Gdx.files.internal("heal.wav"));
+       soundEvil = Gdx.audio.newSound(Gdx.files.internal("hurtScore.wav"));
+       
+    // 🔹 NUEVO: sonido exclusivo para la gota velocidad
+       soundSpeed = Gdx.audio.newSound(Gdx.files.internal("speed.mp3"));
       
 	      musicRain = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
        
        // Creación de objetos e inyección de dependencias
 		  tarro = new Tarro(texTarro, soundHurt);
        lluvia = new Lluvia(texGotaBuena, texGotaMala, texGotaDorada, texGotaCurativa, texGotaMalvada,
-                         soundDrop, soundGold, soundHeal, soundEvil, musicRain);
+                         soundDrop, soundGold, soundHeal, soundEvil, musicRain, texGotaVelocidad, soundSpeed);
 	      
 	      camera = new OrthographicCamera();
 	      camera.setToOrtho(false, 800, 480);
@@ -72,33 +84,36 @@ public class GameLluvia extends ApplicationAdapter {
 	      
 	      tarro.crear();
 	      lluvia.crear();
+	      
+	      controlReinicio = new ControlReinicio(this);
+
 	}
 	
 	@Override
 	public void render () {
-		// --- NINGÚN CAMBIO ES NECESARIO AQUÍ ---
-     // La lógica de renderizado sigue siendo la misma gracias
-     // a la correcta abstracción.
-     
-		ScreenUtils.clear(0, 0, 0.2f, 1);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
-		
-		batch.begin();
-		
-		font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
-		font.draw(batch, "Vidas : " + tarro.getVidas(), 720, 475);
-		
-		if (!tarro.estaHerido()) {
-	        tarro.actualizarMovimiento();        
-	        lluvia.actualizarMovimiento(tarro);	   
-		}
-		
-		tarro.dibujar(batch);
-		lluvia.actualizarDibujoLluvia(batch);
-		
-		batch.end();	
+	    ScreenUtils.clear(0, 0, 0.2f, 1);
+	    camera.update();
+	    batch.setProjectionMatrix(camera.combined);
+
+	    // --- LÓGICA DE JUEGO ---
+	    // Solo se actualiza si NO está en game over
+	    if (!controlReinicio.estaEnGameOver()) {
+	        tarro.actualizarMovimiento();
+	        lluvia.actualizarMovimiento(tarro);
+	    }
+
+	    // --- DIBUJO ---
+	    batch.begin();
+	    font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
+	    font.draw(batch, "Vidas : " + tarro.getVidas(), 720, 475);
+	    tarro.dibujar(batch);
+	    lluvia.actualizarDibujoLluvia(batch);
+	    batch.end();
+
+	    // --- CONTROL DE REINICIO ---
+	    controlReinicio.actualizar(tarro, lluvia);
 	}
+
 	
 	@Override
 	public void dispose () {

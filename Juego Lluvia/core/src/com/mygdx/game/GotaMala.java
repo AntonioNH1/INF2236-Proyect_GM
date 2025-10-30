@@ -11,8 +11,8 @@ public class GotaMala extends ObjetoCaida {
 
     @Override
     protected void aplicarEfecto(Tarro tarro) {
-        tarro.dañar(); // El método dañar() del tarro ya reproduce el sonido
+        // MODIFICADO: Llama al método más genérico
+        tarro.restarVidas(1); 
     }
     
-    // No sobreescribe reproducirSonido(), usando el hook vacío.
 }

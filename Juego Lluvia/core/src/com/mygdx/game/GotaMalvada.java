@@ -14,8 +14,7 @@ public class GotaMalvada extends ObjetoCaida {
 
     @Override
     protected void aplicarEfecto(Tarro tarro) {
-        // Usamos el método sumarPuntos con un valor negativo
-        tarro.sumarPuntos(-100); 
+        tarro.restarVidas(2);
     }
 
     @Override

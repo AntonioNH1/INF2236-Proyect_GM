@@ -23,11 +23,13 @@ public class Lluvia {
     private Texture texGotaDorada;
     private Texture texGotaCurativa;
     private Texture texGotaMalvada;
+    private Texture texGotaVelocidad;
     
     private Sound soundGotaBuena;
     private Sound soundGotaDorada;
     private Sound soundGotaCurativa;
     private Sound soundGotaMalvada;
+    private Sound soundSpeed;
     
     private Music rainMusic;
 	   
@@ -38,7 +40,7 @@ public class Lluvia {
 	public Lluvia(Texture texGotaBuena, Texture texGotaMala, Texture texGotaDorada, 
                   Texture texGotaCurativa, Texture texGotaMalvada, Sound soundGotaBuena, 
                   Sound soundGotaDorada, Sound soundGotaCurativa, Sound soundGotaMalvada, 
-                  Music rainMusic) {
+                  Music rainMusic, Texture texGotaVelocidad, Sound soundSpeed) {
         
         // Texturas
 		this.texGotaBuena = texGotaBuena;
@@ -46,12 +48,14 @@ public class Lluvia {
         this.texGotaDorada = texGotaDorada;
         this.texGotaCurativa = texGotaCurativa;
         this.texGotaMalvada = texGotaMalvada;
+        this.texGotaVelocidad = texGotaVelocidad;
         
         // Sonidos
 		this.soundGotaBuena = soundGotaBuena;
         this.soundGotaDorada = soundGotaDorada;
         this.soundGotaCurativa = soundGotaCurativa;
         this.soundGotaMalvada = soundGotaMalvada;
+        this.soundSpeed = soundSpeed;
 
         this.rainMusic = rainMusic;
 	}
@@ -77,16 +81,24 @@ public class Lluvia {
           int tipo = MathUtils.random(1, 100); // Probabilidad sobre 100
 
           if (tipo <= 15) { // 15% Gota Mala (-1 vida)
-             nuevoObjeto = new GotaMala(texGotaMala, x, y);
-          } else if (tipo <= 22) { // 7% Gota Malvada (-100 pts)
-             nuevoObjeto = new GotaMalvada(texGotaMalvada, soundGotaMalvada, x, y);
-          } else if (tipo <= 30) { // 8% Gota Curativa (+1 vida)
-             nuevoObjeto = new GotaCurativa(texGotaCurativa, soundGotaCurativa, x, y);
-          } else if (tipo <= 35) { // 5% Gota Dorada (+50 pts)
-             nuevoObjeto = new GotaDorada(texGotaDorada, soundGotaDorada, x, y);
-          } else { // 65% Gota Buena (+10 pts)
-             nuevoObjeto = new GotaBuena(texGotaBuena, soundGotaBuena, x, y);
+              nuevoObjeto = new GotaMala(texGotaMala, x, y);
+          } 
+          else if (tipo <= 22) { // 7% Gota Malvada (-100 pts)
+              nuevoObjeto = new GotaMalvada(texGotaMalvada, soundGotaMalvada, x, y);
+          } 
+          else if (tipo <= 30) { // 8% Gota Curativa (+1 vida)
+              nuevoObjeto = new GotaCurativa(texGotaCurativa, soundGotaCurativa, x, y);
+          } 
+          else if (tipo <= 35) { // 5% Gota Dorada (+50 pts)
+              nuevoObjeto = new GotaDorada(texGotaDorada, soundGotaDorada, x, y);
+          } 
+          else if (tipo <= 38) { // 3% Gota Velocidad (usa interfaz EfectoEspecial)
+              nuevoObjeto = new GotaVelocidad(texGotaVelocidad, soundSpeed, x, y);
+          } 
+          else { // 62% Gota Buena (+10 pts)
+              nuevoObjeto = new GotaBuena(texGotaBuena, soundGotaBuena, x, y);
           }
+
 	      
 	      objetosCaida.add(nuevoObjeto);
 	      lastDropTime = TimeUtils.nanoTime();
@@ -147,4 +159,9 @@ public class Lluvia {
 	      // dropSound.dispose(); // <-- Línea eliminada
 	      // rainMusic.dispose(); // <-- Línea eliminada
    }
+   
+   public void reiniciar() {
+	    objetosCaida.clear(); // Limpia todas las gotas actuales
+	}
+
 }
