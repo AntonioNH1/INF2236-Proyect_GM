@@ -22,6 +22,8 @@ public class Tarro {
 	   private float velocidadBase = 400;
 	   private float multiplicadorVelocidad = 1f;
 	   private long tiempoBoost = 0;
+	   private float multiplicadorPuntos = 1.0f;
+	   private long tiempoBonus = 0;
 	   
 	   public Tarro(Texture tex, Sound ss) {
 		   bucketImage = tex;
@@ -38,10 +40,19 @@ public class Tarro {
 		public Rectangle getArea() {
 			return bucket;
 		}
-		public void sumarPuntos(int pp) {
-			puntos+=pp;
-            // Asegurarse de que los puntos no sean negativos (opcional)
-            if (puntos < 0) puntos = 0; 
+		public void sumarPuntos(int puntos) {
+		    this.puntos += puntos * multiplicadorPuntos;
+		}
+
+		public void activarMultiplicador(float factor, int duracionSegundos) {
+		    this.multiplicadorPuntos = factor;
+		    this.tiempoBonus = System.currentTimeMillis() + (duracionSegundos * 1000);
+		}
+
+		public void actualizarBonificaciones() {
+		    if (multiplicadorPuntos > 1.0f && System.currentTimeMillis() > tiempoBonus) {
+		        multiplicadorPuntos = 1.0f;
+		    }
 		}
 		
 		/**
@@ -49,10 +60,9 @@ public class Tarro {
 		 */
 		public void sumarVida() {
 		    vidas++;
-		    if (vidas > 3) vidas = 3; // límite máximo (puedes cambiarlo)
+		    if (vidas > 3) vidas = 3; // límite máximo 
 		}
 
-	
 	   public void crear() {
  		  // ... (sin cambios)
 		  bucket = new Rectangle();
@@ -66,12 +76,11 @@ public class Tarro {
 	   public void restarVidas(int cantidad) {
 		    if (vidas <= 0) return; // evita seguir restando si ya está en 0
 		    vidas -= cantidad;
-		    if (vidas < 0) vidas = 0; 
+		    if (vidas < 0) vidas = 0; // nunca bajo cero
 		    herido = true;
 		    tiempoHerido = tiempoHeridoMax;
 		    sonidoHerido.play();
 		}
-
 
 	   
 	   public void dibujar(SpriteBatch batch) {
@@ -124,10 +133,14 @@ public class Tarro {
 	   return herido;
    }
    
-   public void reiniciar() {
-	    this.vidas = 3;
-	    this.puntos = 0;
-	    this.bucket.x = 800 / 2 - 64 / 2;
-	    this.bucket.y = 20;
+   public void dañar() {
+	    if (vidas <= 0) return;
+	    vidas--;
+	    if (vidas < 0) vidas = 0;
+	    herido = true;
+	    tiempoHerido = tiempoHeridoMax;
+	    sonidoHerido.play();
 	}
+
+	   
 }

@@ -24,12 +24,14 @@ public class Lluvia {
     private Texture texGotaCurativa;
     private Texture texGotaMalvada;
     private Texture texGotaVelocidad;
+    private Texture texBonificacionX2;
     
     private Sound soundGotaBuena;
     private Sound soundGotaDorada;
     private Sound soundGotaCurativa;
     private Sound soundGotaMalvada;
     private Sound soundSpeed;
+    private Sound soundBonus;
     
     private Music rainMusic;
 	   
@@ -40,7 +42,7 @@ public class Lluvia {
 	public Lluvia(Texture texGotaBuena, Texture texGotaMala, Texture texGotaDorada, 
                   Texture texGotaCurativa, Texture texGotaMalvada, Sound soundGotaBuena, 
                   Sound soundGotaDorada, Sound soundGotaCurativa, Sound soundGotaMalvada, 
-                  Music rainMusic, Texture texGotaVelocidad, Sound soundSpeed) {
+                  Music rainMusic, Texture texGotaVelocidad, Sound soundSpeed, Texture texBonificacionX2, Sound soundBonus) {
         
         // Texturas
 		this.texGotaBuena = texGotaBuena;
@@ -49,6 +51,7 @@ public class Lluvia {
         this.texGotaCurativa = texGotaCurativa;
         this.texGotaMalvada = texGotaMalvada;
         this.texGotaVelocidad = texGotaVelocidad;
+        this.texBonificacionX2 = texBonificacionX2;
         
         // Sonidos
 		this.soundGotaBuena = soundGotaBuena;
@@ -56,6 +59,7 @@ public class Lluvia {
         this.soundGotaCurativa = soundGotaCurativa;
         this.soundGotaMalvada = soundGotaMalvada;
         this.soundSpeed = soundSpeed;
+        this.soundBonus = soundBonus;
 
         this.rainMusic = rainMusic;
 	}
@@ -94,7 +98,10 @@ public class Lluvia {
           } 
           else if (tipo <= 38) { // 3% Gota Velocidad (usa interfaz EfectoEspecial)
               nuevoObjeto = new GotaVelocidad(texGotaVelocidad, soundSpeed, x, y);
-          } 
+          }
+          else if (tipo <= 40) { // 2% Gota X2 (doble de puntos)
+        	  nuevoObjeto = new GotaX2(texBonificacionX2, soundBonus, x, y);
+          }
           else { // 62% Gota Buena (+10 pts)
               nuevoObjeto = new GotaBuena(texGotaBuena, soundGotaBuena, x, y);
           }
@@ -138,6 +145,7 @@ public class Lluvia {
 	    	  iter.remove(); // Eliminar de la lista
 	      }
 	   }   
+	   tarro.actualizarBonificaciones();
    }
    
    /**
@@ -159,9 +167,4 @@ public class Lluvia {
 	      // dropSound.dispose(); // <-- Línea eliminada
 	      // rainMusic.dispose(); // <-- Línea eliminada
    }
-   
-   public void reiniciar() {
-	    objetosCaida.clear(); // Limpia todas las gotas actuales
-	}
-
 }

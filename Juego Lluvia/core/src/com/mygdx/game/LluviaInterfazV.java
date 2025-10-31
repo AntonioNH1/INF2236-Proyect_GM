@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class PruebaGameLLuvia extends ApplicationAdapter {
+public class LluviaInterfazV extends ApplicationAdapter {
     private OrthographicCamera camera;
 	   private SpriteBatch batch;	   
 	   private BitmapFont font;
@@ -66,7 +66,7 @@ public class PruebaGameLLuvia extends ApplicationAdapter {
        
     // 🔹 NUEVO: sonido exclusivo para la gota velocidad
        soundSpeed = Gdx.audio.newSound(Gdx.files.internal("soundSpeed.wav"));
-       soundBonus = Gdx.audio.newSound(Gdx.files.internal("speed.mp3"));
+       soundBonus = Gdx.audio.newSound(Gdx.files.internal("soundBonus.wav"));
       
 	      musicRain = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
        
