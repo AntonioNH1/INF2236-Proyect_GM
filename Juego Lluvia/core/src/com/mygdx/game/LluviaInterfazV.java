@@ -7,8 +7,15 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Preferences; 
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
 public class LluviaInterfazV extends ApplicationAdapter {
     private OrthographicCamera camera;
@@ -18,7 +25,6 @@ public class LluviaInterfazV extends ApplicationAdapter {
 	   private Tarro tarro;
 	   private Lluvia lluvia;
     
-    // MODIFICADO: Almacenamos todos los assets aquí
     private Texture texTarro;
     private Texture texGotaBuena;
     private Texture texGotaMala;
@@ -38,56 +44,75 @@ public class LluviaInterfazV extends ApplicationAdapter {
     
     private Music musicRain;
     
+
+    private enum GameState {
+        RUNNING,
+        GAME_OVER
+    }
+    private GameState gameState;
+
+
+    private GlyphLayout glyphLayout; // para centrar texto
+    private Rectangle retryButton;   // para detectar clics en el botón
+    private Vector3 touchPos;        // para las coordenadas del clic
+    
+    private Preferences prefs; // el objeto que maneja el guardado
+    private int highscore;     // highscore actual
+    
 	@Override
 	public void create () {
 		 font = new BitmapFont();
 		 
-		  // Cargar todas las texturas
-		  texTarro = new Texture(Gdx.files.internal("bucket.png"));
-       texGotaBuena = new Texture(Gdx.files.internal("drop.png"));
-       texGotaMala = new Texture(Gdx.files.internal("dropBad.png"));
-       // Asegúrate de tener estas imágenes en tu carpeta 'assets' (o 'internal')
-       texGotaDorada = new Texture(Gdx.files.internal("dropGold.png"));
-       texGotaCurativa = new Texture(Gdx.files.internal("dropHeal.png"));
-       texGotaMalvada = new Texture(Gdx.files.internal("dropEvil.png"));
+         prefs = Gdx.app.getPreferences("MiJuegoDeLluvia"); 
+         highscore = prefs.getInteger("highscore", 0);
+         
+		 
+	     texTarro = new Texture(Gdx.files.internal("bucket.png"));
+         texGotaBuena = new Texture(Gdx.files.internal("drop.png"));
+         texGotaMala = new Texture(Gdx.files.internal("dropBad.png"));
+
+         texGotaDorada = new Texture(Gdx.files.internal("dropGold.png"));
+         texGotaCurativa = new Texture(Gdx.files.internal("dropHeal.png"));
+         texGotaMalvada = new Texture(Gdx.files.internal("dropEvil.png"));
        
-       // 🔹 NUEVO: textura de la gota velocidad
-       texGotaVelocidad = new Texture(Gdx.files.internal("dropVelocidad.png"));
-       // asegúrate de tener "dropSpeed.png" en la carpeta assets
-       texX2 = new Texture(Gdx.files.internal("x2.png"));
+         texGotaVelocidad = new Texture(Gdx.files.internal("dropVelocidad.png"));
        
-	      // Cargar todos los sonidos
-       soundHurt = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
-       soundDrop = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-       // Asegúrate de tener estos sonidos
-       soundGold = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-       soundHeal = Gdx.audio.newSound(Gdx.files.internal("heal.wav"));
-       soundEvil = Gdx.audio.newSound(Gdx.files.internal("hurtScore.wav"));
+         texX2 = new Texture(Gdx.files.internal("x2.png"));
        
-    // 🔹 NUEVO: sonido exclusivo para la gota velocidad
-       soundSpeed = Gdx.audio.newSound(Gdx.files.internal("soundSpeed.wav"));
-       soundBonus = Gdx.audio.newSound(Gdx.files.internal("soundBonus.wav"));
+	     
+         soundHurt = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
+         soundDrop = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+       
+         soundGold = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+         soundHeal = Gdx.audio.newSound(Gdx.files.internal("heal.wav"));
+         soundEvil = Gdx.audio.newSound(Gdx.files.internal("hurtScore.wav"));
+       
+   
+         soundSpeed = Gdx.audio.newSound(Gdx.files.internal("soundSpeed.wav"));
+         soundBonus = Gdx.audio.newSound(Gdx.files.internal("soundBonus.wav"));
       
-	      musicRain = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+	     musicRain = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
        
-       // Creación de objetos e inyección de dependencias
-		  tarro = new Tarro(texTarro, soundHurt);
-       lluvia = new Lluvia(texGotaBuena, texGotaMala, texGotaDorada, texGotaCurativa, texGotaMalvada,
+      
+		 tarro = new Tarro(texTarro, soundHurt);
+         lluvia = new Lluvia(texGotaBuena, texGotaMala, texGotaDorada, texGotaCurativa, texGotaMalvada,
                          soundDrop, soundGold, soundHeal, soundEvil, musicRain, texGotaVelocidad, soundSpeed, texX2, soundBonus);
 	      
-	      camera = new OrthographicCamera();
-	      camera.setToOrtho(false, 800, 480);
-	      batch = new SpriteBatch();
+	     camera = new OrthographicCamera();
+	     camera.setToOrtho(false, 800, 480);
+	     batch = new SpriteBatch();
 	      
-	      tarro.crear();
-	      lluvia.crear();
+	     tarro.crear();
+	     lluvia.crear();
+	      
+	     gameState = GameState.RUNNING; 
+         glyphLayout = new GlyphLayout();
+         retryButton = new Rectangle();
+         touchPos = new Vector3();
 	}
 	
 	@Override
 	public void render () {
-		// --- NINGÚN CAMBIO ES NECESARIO AQUÍ ---
-     // La lógica de renderizado sigue siendo la misma gracias
-     // a la correcta abstracción.
      
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		camera.update();
@@ -95,25 +120,88 @@ public class LluviaInterfazV extends ApplicationAdapter {
 		
 		batch.begin();
 		
-		font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
-		font.draw(batch, "Vidas : " + tarro.getVidas(), 720, 475);
-		
-		if (!tarro.estaHerido()) {
-	        tarro.actualizarMovimiento();        
-	        lluvia.actualizarMovimiento(tarro);	   
-		}
-		
-		tarro.dibujar(batch);
-		lluvia.actualizarDibujoLluvia(batch);
+		switch (gameState) {
+        
+        case RUNNING:
+            font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
+            font.draw(batch, "Vidas : " + tarro.getVidas(), 720, 475);
+            font.draw(batch, "Highscore: " + highscore, 350, 475); 
+            
+            if (!tarro.estaHerido()) {
+                tarro.actualizarMovimiento();        
+                lluvia.actualizarMovimiento(tarro);	   
+            }
+            
+            tarro.dibujar(batch);
+            lluvia.actualizarDibujoLluvia(batch);
+
+            if (tarro.getVidas() <= 0) {
+                musicRain.stop(); 
+                
+                // guardar el highscore
+                if (tarro.getPuntos() > highscore) {
+                    highscore = tarro.getPuntos(); 
+                    prefs.putInteger("highscore", highscore); 
+                    prefs.flush(); // lo guarda en disco
+                }
+                
+                gameState = GameState.GAME_OVER; 
+            }
+            break;
+        
+        case GAME_OVER:
+
+            glyphLayout.setText(font, "GAME OVER");
+            float goX = (800 - glyphLayout.width) / 2;
+            float goY = (480 + glyphLayout.height) / 2 + 50; 
+            font.draw(batch, glyphLayout, goX, goY);
+            
+            glyphLayout.setText(font, "Tu Puntuacion: " + tarro.getPuntos());
+            float scoreX = (800 - glyphLayout.width) / 2;
+            float scoreY = goY - 50; 
+            font.draw(batch, glyphLayout, scoreX, scoreY);
+
+            glyphLayout.setText(font, "Highscore: " + highscore);
+            float hsX = (800 - glyphLayout.width) / 2;
+            float hsY = scoreY - 30; 
+            font.draw(batch, glyphLayout, hsX, hsY);
+
+            glyphLayout.setText(font, "Reintentar");
+            float retryX = (800 - glyphLayout.width) / 2;
+            float retryY = hsY - 50; 
+            font.draw(batch, glyphLayout, retryX, retryY);
+
+
+            retryButton.set(retryX, retryY - glyphLayout.height, glyphLayout.width, glyphLayout.height);
+
+
+            if (Gdx.input.isTouched()) {
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
+
+                if (retryButton.contains(touchPos.x, touchPos.y)) {
+                    resetGame(); 
+                }
+            }
+            break;
+    }
 		
 		batch.end();	
 	}
 	
+	
+	public void resetGame() {
+        tarro.reset();   
+        lluvia.reset();   
+        musicRain.play();
+        gameState = GameState.RUNNING;
+    }
+	
 	@Override
 	public void dispose () {
-       // MODIFICADO: Esta clase ahora libera todos los assets que cargó
-	      tarro.destruir(); // (ahora vacío)
-       lluvia.destruir(); // (ahora vacío)
+		
+	   tarro.destruir(); 
+       lluvia.destruir(); 
 	      
        // Texturas
        texTarro.dispose();

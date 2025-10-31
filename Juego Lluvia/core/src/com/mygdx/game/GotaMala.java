@@ -4,14 +4,13 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class GotaMala extends ObjetoCaida {
 
-    // No necesita sonido propio, el tarro lo reproduce al ser dañado
+
     public GotaMala(Texture textura, float x, float y) {
         super(textura, x, y);
     }
 
     @Override
     protected void aplicarEfecto(Tarro tarro) {
-        // MODIFICADO: Llama al método más genérico
         tarro.restarVidas(1); 
     }
     

@@ -1,9 +1,6 @@
 package com.mygdx.game;
 
-/**
- * Estrategia concreta que implementa un efecto de velocidad.
- * Aumenta temporalmente la velocidad del tarro.
- */
+
 public class EfectoVelocidad implements EfectoEspecial {
 
     private float factor;

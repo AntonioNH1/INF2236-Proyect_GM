@@ -30,24 +30,24 @@ public class Tarro {
 		   sonidoHerido = ss;
 	   }
 	   
-		public int getVidas() {
+	   public int getVidas() {
 			return vidas;
-		}
+	   }
 	
-		public int getPuntos() {
+	   public int getPuntos() {
 			return puntos;
-		}
-		public Rectangle getArea() {
+	   }
+	   public Rectangle getArea() {
 			return bucket;
-		}
-		public void sumarPuntos(int puntos) {
+	   }
+	   public void sumarPuntos(int puntos) {
 		    this.puntos += puntos * multiplicadorPuntos;
-		}
+	   }
 
-		public void activarMultiplicador(float factor, int duracionSegundos) {
+	   public void activarMultiplicador(float factor, int duracionSegundos) {
 		    this.multiplicadorPuntos = factor;
 		    this.tiempoBonus = System.currentTimeMillis() + (duracionSegundos * 1000);
-		}
+	   }
 
 		public void actualizarBonificaciones() {
 		    if (multiplicadorPuntos > 1.0f && System.currentTimeMillis() > tiempoBonus) {
@@ -55,36 +55,31 @@ public class Tarro {
 		    }
 		}
 		
-		/**
-		 * NUEVO MÉTODO para la GotaCurativa
-		 */
 		public void sumarVida() {
-		    vidas++;
-		    if (vidas > 3) vidas = 3; // límite máximo 
+			if (this.vidas < 3) {
+                this.vidas++;
+            }
 		}
-
+	
 	   public void crear() {
- 		  // ... (sin cambios)
 		  bucket = new Rectangle();
 		  bucket.x = 800 / 2 - 64 / 2;
 		  bucket.y = 20;
 		  bucket.width = 64;
 		  bucket.height = 64;
+		  
 	   }
 	   
 	   
 	   public void restarVidas(int cantidad) {
-		    if (vidas <= 0) return; // evita seguir restando si ya está en 0
-		    vidas -= cantidad;
-		    if (vidas < 0) vidas = 0; // nunca bajo cero
-		    herido = true;
-		    tiempoHerido = tiempoHeridoMax;
-		    sonidoHerido.play();
-		}
-
+		   vidas -= cantidad;
+		   herido = true;
+		   tiempoHerido = tiempoHeridoMax;
+		   sonidoHerido.play(); 
+	   }
 	   
 	   public void dibujar(SpriteBatch batch) {
- 		  // ... (sin cambios)
+
 		 if (!herido)  
 		   batch.draw(bucketImage, bucket.x, bucket.y);
 		 else {
@@ -119,28 +114,29 @@ public class Tarro {
 	       if (bucket.x > 800 - bucket.width) bucket.x = 800 - bucket.width;
 	   }
 	   
+	   
+	   public void reset() {
+	        this.vidas = 3;
+	        this.puntos = 0;
+	        this.herido = false;
+	        this.tiempoHerido = 0;
+	        this.multiplicadorVelocidad = 1f;
+	        this.tiempoBoost = 0;
+	        this.multiplicadorPuntos = 1.0f;
+	        this.tiempoBonus = 0;
+
+	        bucket.x = 800 / 2 - 64 / 2;
+			bucket.y = 20;
+	    }
+	   
 	    
-	/**
-	 * MODIFICADO: La clase que carga un recurso (PruebaGameLLuvia)
-	 * debe ser la que lo libera. Tarro ya no es responsable de
-	 * liberar 'bucketImage'.
-	 */
+
 	public void destruir() {
-		    // bucketImage.dispose(); // <-- Línea eliminada
+		  
 	}
 	
    public boolean estaHerido() {
 	   return herido;
    }
-   
-   public void dañar() {
-	    if (vidas <= 0) return;
-	    vidas--;
-	    if (vidas < 0) vidas = 0;
-	    herido = true;
-	    tiempoHerido = tiempoHeridoMax;
-	    sonidoHerido.play();
-	}
-
 	   
 }

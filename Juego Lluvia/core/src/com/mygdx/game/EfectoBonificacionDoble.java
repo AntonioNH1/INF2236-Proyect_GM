@@ -1,9 +1,6 @@
 package com.mygdx.game;
 
-/**
- * Aplica un multiplicador temporal de puntos al tarro.
- * Implementa EfectoEspecial (Strategy pattern).
- */
+
 public class EfectoBonificacionDoble implements EfectoEspecial {
 
     private int duracionSegundos;

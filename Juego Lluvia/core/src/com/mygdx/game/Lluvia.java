@@ -13,11 +13,11 @@ import java.util.Iterator; // Importante usar el iterador
 
 public class Lluvia {
     
-    // MODIFICADO: Un solo Array que usa Polimorfismo (LSP)
+
 	private Array<ObjetoCaida> objetosCaida; 
     private long lastDropTime;
     
-    // Almacenamos todas las "plantillas" (texturas y sonidos)
+
     private Texture texGotaBuena;
     private Texture texGotaMala;
     private Texture texGotaDorada;
@@ -35,10 +35,7 @@ public class Lluvia {
     
     private Music rainMusic;
 	   
-    /**
-     * MODIFICADO: El constructor ahora recibe todos los assets necesarios
-     * para actuar como una "Fábrica" de objetos.
-     */
+
 	public Lluvia(Texture texGotaBuena, Texture texGotaMala, Texture texGotaDorada, 
                   Texture texGotaCurativa, Texture texGotaMalvada, Sound soundGotaBuena, 
                   Sound soundGotaDorada, Sound soundGotaCurativa, Sound soundGotaMalvada, 
@@ -65,44 +62,41 @@ public class Lluvia {
 	}
 	
 	public void crear() {
-        // MODIFICADO: Inicializa el nuevo Array
+
 		objetosCaida = new Array<ObjetoCaida>(); 
-		crearObjetoCaida(); // Renombrado de crearGotaDeLluvia
+		crearObjetoCaida(); 
 	      
 	    rainMusic.setLooping(true);
 	    rainMusic.play();
 	}
 	
-    /**
-     * MODIFICADO: Este método ahora actúa como un "Factory Method"
-     * Decide qué tipo de ObjetoCaida instanciar.
-     */
+
 	private void crearObjetoCaida() {
 	      float x = MathUtils.random(0, 800-64);
 	      float y = 480;
 	      
 	      ObjetoCaida nuevoObjeto;
-          int tipo = MathUtils.random(1, 100); // Probabilidad sobre 100
+          int tipo = MathUtils.random(1, 100); 
 
-          if (tipo <= 15) { // 15% Gota Mala (-1 vida)
+          if (tipo <= 30) {
               nuevoObjeto = new GotaMala(texGotaMala, x, y);
           } 
-          else if (tipo <= 22) { // 7% Gota Malvada (-100 pts)
+          else if (tipo <= 42) { 
               nuevoObjeto = new GotaMalvada(texGotaMalvada, soundGotaMalvada, x, y);
           } 
-          else if (tipo <= 30) { // 8% Gota Curativa (+1 vida)
+          else if (tipo <= 50) {
               nuevoObjeto = new GotaCurativa(texGotaCurativa, soundGotaCurativa, x, y);
           } 
-          else if (tipo <= 35) { // 5% Gota Dorada (+50 pts)
+          else if (tipo <= 55) { 
               nuevoObjeto = new GotaDorada(texGotaDorada, soundGotaDorada, x, y);
           } 
-          else if (tipo <= 38) { // 3% Gota Velocidad (usa interfaz EfectoEspecial)
+          else if (tipo <= 58) {
               nuevoObjeto = new GotaVelocidad(texGotaVelocidad, soundSpeed, x, y);
           }
-          else if (tipo <= 40) { // 2% Gota X2 (doble de puntos)
+          else if (tipo <= 60) { 
         	  nuevoObjeto = new GotaX2(texBonificacionX2, soundBonus, x, y);
           }
-          else { // 62% Gota Buena (+10 pts)
+          else { 
               nuevoObjeto = new GotaBuena(texGotaBuena, soundGotaBuena, x, y);
           }
 
@@ -111,16 +105,10 @@ public class Lluvia {
 	      lastDropTime = TimeUtils.nanoTime();
 	   }
 	
-   /**
-    * MODIFICADO: Lógica de actualización y colisión refactorizada.
-    * Ya no usa 'if-else' para los tipos.
-    */
+
    public void actualizarMovimiento(Tarro tarro) { 
-	   // generar gotas
 	   if(TimeUtils.nanoTime() - lastDropTime > 100000000) crearObjetoCaida();
 	  
-	   // Usamos un Iterador para poder eliminar objetos de forma segura
-       // mientras recorremos la lista.
 	   Iterator<ObjetoCaida> iter = objetosCaida.iterator();
 	   while (iter.hasNext()) {
 		  ObjetoCaida objeto = iter.next();
@@ -130,28 +118,23 @@ public class Lluvia {
 	      
           // 2. Revisar si cae al suelo
 	      if(objeto.getArea().y + 64 < 0) {
-	    	  iter.remove(); // Eliminar de la lista
-	    	  continue; // Saltar a la siguiente iteración
+	    	  iter.remove(); 
+	    	  continue; 
 	      }
           
           // 3. Revisar si colisiona con el tarro
 	      if(objeto.getArea().overlaps(tarro.getArea())) {
               
-              // --- ¡AQUÍ ESTÁ LA MAGIA! (OCP, LSP, DIP, Template Method) ---
-              // Lluvia (alto nivel) le dice al objeto (bajo nivel)
-              // que procese su propia colisión. No le importa de qué tipo es.
+
 	    	  objeto.procesarColision(tarro);
 	    	  
-	    	  iter.remove(); // Eliminar de la lista
+	    	  iter.remove(); // 
 	      }
 	   }   
 	   tarro.actualizarBonificaciones();
    }
    
-   /**
-    * MODIFICADO: Lógica de dibujo refactorizada.
-    * Ya no usa 'if-else' para dibujar.
-    */
+
    public void actualizarDibujoLluvia(SpriteBatch batch) { 
 	  // Cada objeto sabe cómo dibujarse a sí mismo (LSP)
 	  for (ObjetoCaida objeto : objetosCaida) {
@@ -159,12 +142,15 @@ public class Lluvia {
 	  }
    }
    
-   /**
-    * MODIFICADO: La clase principal (PruebaGameLLuvia)
-    * se encargará de liberar los sonidos y la música.
-    */
+
    public void destruir() {
-	      // dropSound.dispose(); // <-- Línea eliminada
-	      // rainMusic.dispose(); // <-- Línea eliminada
+
+   }
+   
+   public void reset() {
+       if (objetosCaida != null) {
+           objetosCaida.clear(); 
+       }
+       crearObjetoCaida(); 
    }
 }
