@@ -31,22 +31,22 @@ public class Lluvia {
         
         Recursos res = Recursos.getInstancia();
 
-        if (tipo <= 30) {
+        if (tipo <= 15) {
             nuevoObjeto = new GotaMala(res.texGotaMala, x, y);
         } 
-        else if (tipo <= 42) { 
+        else if (tipo <=25) { 
             nuevoObjeto = new GotaMalvada(res.texGotaMalvada, res.soundEvil, x, y);
         } 
-        else if (tipo <= 50) {
+        else if (tipo <= 35) {
             nuevoObjeto = new GotaCurativa(res.texGotaCurativa, res.soundHeal, x, y);
         } 
-        else if (tipo <= 55) { 
+        else if (tipo <= 42) { 
             nuevoObjeto = new GotaDorada(res.texGotaDorada, res.soundDrop, x, y);
         } 
-        else if (tipo <= 58) {
+        else if (tipo <= 50) {
             nuevoObjeto = new GotaVelocidad(res.texGotaVelocidad, res.soundSpeed, x, y);
         }
-        else if (tipo <= 60) { 
+        else if (tipo <= 55) { 
             nuevoObjeto = new GotaX2(res.texX2, res.soundBonus, x, y);
         }
         else { 
